@@ -29,13 +29,29 @@ public class PotokClient implements Runnable {
         }
 
     }
+
+    public void sendM(String mess){
+        out.println(mess);
+        out.flush();
+    }
     @Override
     public void run(){
         try{
             while (true){
-
+                 server.MessageAll("Hi Client");
+                 server.MessageAll(client_+"");
                 break;
             }
+
+            while (true){
+                 String clientM = in.nextLine();
+                 if(clientM.equals("Goodbye")){
+                     break;
+                 }
+                 System.out.println(clientM);//Для разработчиков
+                 server.MessageAll(clientM);//Для клиентов
+            }
+
             Thread.sleep(100);
         }catch(Exception e){
 
