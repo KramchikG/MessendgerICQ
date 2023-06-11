@@ -1,10 +1,5 @@
 package Client;
 
-
-
-import java.io.IOException;
-import java.net.Socket;
-
 public class Client {
 
     private static ModelGuiClient model;
