@@ -1,10 +1,14 @@
 package Client;
 
+import Connection.*;
+
+
 public class Client {
 
+    private Connection connection;
     private static ModelGuiClient model;
     private static ViewGuiClient gui;
-    private volatile boolean isConnect = false; //флаг отобаржающий состояние подключения клиента  серверу
+    private volatile boolean isConnect = false; // флаг, отображающий состояние подключения клиента к серверу
     /**
      * Проверяет, установлено ли подключение клиента к серверу.
      *
@@ -31,12 +35,11 @@ public class Client {
         model = new ModelGuiClient();
         gui = new ViewGuiClient(client);
         gui.initFrameClient();
-        // Бесконечный цикл для обработки состояния подключения
+
         while (true) {
             if (client.isConnect()) {
-                // Действия, выполняемые при подключении клиента
 
-                client.setConnect(false); // Сброс флага подключения
+                client.setConnect(false);
             }
         }
     }
