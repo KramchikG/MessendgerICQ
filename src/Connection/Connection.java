@@ -20,7 +20,30 @@ public class Connection implements Closeable {
         this.in = new ObjectInputStream(socket.getInputStream());
     }
 
+    /**
+     * Отправляет сообщение по сокетному соединению.
+     *
+     * @param message сообщение для отправки
+     * @throws IOException если возникла ошибка при отправке сообщения
+     */
+    public void send(Message message) throws IOException {
+        synchronized (out) {
+            out.writeObject(message);
+        }
+    }
 
+    /**
+     * Принимает сообщение по сокетному соединению.
+     *
+     * @return принятое сообщение
+     * @throws IOException            если возникла ошибка при приеме сообщения
+     * @throws ClassNotFoundException если класс сообщения не найден при десериализации
+     */
+    public Message receive() throws IOException, ClassNotFoundException {
+        synchronized (in) {
+            return (Message) in.readObject();
+        }
+    }
 
     /**
      * Закрывает потоки чтения, записи и сокет.
