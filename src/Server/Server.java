@@ -121,6 +121,47 @@ public class Server {
                 }
             }
         }
+        //метод, реализующий обмен сообщениями между пользователями
+        private void messagingBetweenUsers(Connection connection, String userName) {
+            while (true) {
+                try {
+                    Message message = connection.receive();
+                    //приняли сообщение от клиента, если тип сообщения TEXT_MESSAGE то пересылаем его всем пользователям
+                    if (message.getTypeMessage() == MessageType.TEXT_MESSAGE) {
+                        String textMessage = String.format("%s: %s\n", userName, message.getTextMessage());
+                        sendMessageAllUsers(new Message(MessageType.TEXT_MESSAGE, textMessage));
+                    }
+                    //если тип сообщения DISABLE_USER, то рассылаем всем пользователям, что данный пользователь покинул чат,
+                    //удаляем его из мапы, закрываем его connection
+                    if (message.getTypeMessage() == MessageType.DISABLE_USER) {
+                        sendMessageAllUsers(new Message(MessageType.REMOVED_USER, userName));
+                        model.removeUser(userName);
+                        connection.close();
+                        gui.refreshDialogWindowServer(String.format("Пользователь с удаленным доступом %s отключился.\n", socket.getRemoteSocketAddress()));
+                        break;
+                    }
+                } catch (Exception e) {
+                    gui.refreshDialogWindowServer(String.format("Произошла ошибка при рассылке сообщения от пользователя %s, либо отключился!\n", userName));
+                    break;
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            gui.refreshDialogWindowServer(String.format("Подключился новый пользователь с удаленным сокетом - %s.\n", socket.getRemoteSocketAddress()));
+            try {
+                //получаем connection при помощи принятого сокета от клиента и запрашиваем имя, регистрируем, запускаем
+                //цикл обмена сообщениями между пользователями
+                Connection connection = new Connection(socket);
+                String nameUser = requestAndAddingUser(connection);
+                messagingBetweenUsers(connection, nameUser);
+            } catch (Exception e) {
+                gui.refreshDialogWindowServer(String.format("Произошла ошибка при рассылке сообщения от пользователя!\n"));
+            }
+        }
     }
-}
+    }
+
+
 
