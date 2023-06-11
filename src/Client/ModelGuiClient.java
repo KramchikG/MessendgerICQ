@@ -4,42 +4,26 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ModelGuiClient {
-
+    // В модели клиентского приложения хранится множество подключенных пользователей
     private Set<String> users = new HashSet<>();
 
-    /**
-     * Отримати множину користувачів.
-     *
-     * @return множина користувачів
-     */
-    protected Set<String> getUsers(){
+    // Метод для получения множества подключенных пользователей
+    protected Set<String> getUsers() {
         return users;
     }
 
-    /**
-     * Додати користувача до множини користувачів.
-     *
-     * @param nameUser ім'я користувача для додавання
-     */
+    // Метод для добавления пользователя в множество подключенных пользователей
     protected void addUser(String nameUser) {
         users.add(nameUser);
     }
 
-    /**
-     * Видалити користувача з множини користувачів.
-     *
-     * @param nameUser ім'я користувача для видалення
-     */
+    // Метод для удаления пользователя из множества подключенных пользователей
     protected void removeUser(String nameUser) {
         users.remove(nameUser);
     }
 
-    /**
-     * Встановити множину користувачів.
-     *
-     * @param users множина користувачів для встановлення
-     */
-    protected void setUsers(Set<String> users){
+    // Метод для установки множества подключенных пользователей
+    protected void setUsers(Set<String> users) {
         this.users = users;
     }
 }

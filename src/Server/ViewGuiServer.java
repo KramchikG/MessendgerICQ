@@ -8,41 +8,45 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class ViewGuiServer {
-    private JFrame frame = new JFrame("Запуск сервера");
-    private JTextArea dialogWindow = new JTextArea(10, 40);
-    private JButton buttonStartServer = new JButton("Запустить сервер");
-    private JButton buttonStopServer = new JButton("Остановить сервер");
-    private JPanel panelButtons = new JPanel();
-    private final Server server;
+    private JFrame frame = new JFrame("Запуск сервера"); // Создание окна приложения
+    private JTextArea dialogWindow = new JTextArea(10, 40); // Создание текстового поля для вывода сообщений
+    private JButton buttonStartServer = new JButton("Запустить сервер"); // Кнопка "Запустить сервер"
+    private JButton buttonStopServer = new JButton("Остановить сервер"); // Кнопка "Остановить сервер"
+    private JPanel panelButtons = new JPanel(); // Панель с кнопками
+    private final Server server; // Ссылка на сервер
 
     public ViewGuiServer(Server server) {
         this.server = server;
     }
 
-    // метод инициализации графического интерфейса приложения сервера
+    // Метод инициализации графического интерфейса приложения сервера
     protected void initFrameServer() {
         dialogWindow.setEditable(false);
-        dialogWindow.setLineWrap(true); // автоматический перенос строки в JTextArea
-        frame.add(new JScrollPane(dialogWindow), BorderLayout.CENTER);
+        dialogWindow.setLineWrap(true); // Автоматический перенос строки в JTextArea
+        dialogWindow.setBackground(Color.BLACK);
+        dialogWindow.setForeground(Color.WHITE);
+        frame.add(new JScrollPane(dialogWindow), BorderLayout.CENTER); // Добавление JTextArea в окно приложения
 
         // Создание и добавление панели с кнопками разговоров
         JPanel panelConversationList = new JPanel();
         JButton buttonConversation1 = new JButton("Разговор 1");
         JButton buttonConversation2 = new JButton("Разговор 2");
         JButton buttonConversation3 = new JButton("Разговор 3");
+        panelConversationList.setBackground(Color.DARK_GRAY);
         panelConversationList.add(buttonConversation1);
         panelConversationList.add(buttonConversation2);
         panelConversationList.add(buttonConversation3);
-        frame.add(panelConversationList, BorderLayout.NORTH);
+        frame.add(panelConversationList, BorderLayout.NORTH); // Добавление панели разговоров в верхнюю часть окна
 
+        panelButtons.setBackground(Color.DARK_GRAY);
         panelButtons.add(buttonStartServer);
         panelButtons.add(buttonStopServer);
-        frame.add(panelButtons, BorderLayout.SOUTH);
+        frame.add(panelButtons, BorderLayout.SOUTH); // Добавление панели с кнопками в нижнюю часть окна
         frame.pack();
-        frame.setLocationRelativeTo(null); // при запуске отображает окно по центру экрана
+        frame.setLocationRelativeTo(null); // При запуске отображает окно по центру экрана
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-        // класс обработки события при закрытии окна приложения Сервера
+        // Класс обработки события при закрытии окна приложения Сервера
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -51,6 +55,12 @@ public class ViewGuiServer {
             }
         });
         frame.setVisible(true);
+
+        buttonStartServer.setBackground(Color.GREEN);
+        buttonStopServer.setBackground(Color.RED);
+        buttonConversation1.setBackground(Color.GRAY);
+        buttonConversation2.setBackground(Color.GRAY);
+        buttonConversation3.setBackground(Color.GRAY);
 
         buttonStartServer.addActionListener(new ActionListener() {
             @Override
@@ -91,12 +101,12 @@ public class ViewGuiServer {
         });
     }
 
-    // метод, который добавляет в текстовое окно новое сообщение
+    // Метод, который добавляет в текстовое окно новое сообщение
     public void refreshDialogWindowServer(String serviceMessage) {
         dialogWindow.append(serviceMessage);
     }
 
-    // метод вызывающий диалоговое окно для ввода порта сервера
+    // Метод вызывающий диалоговое окно для ввода порта сервера
     protected int getPortFromOptionPane() {
         while (true) {
             String port = JOptionPane.showInputDialog(

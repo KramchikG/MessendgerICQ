@@ -2,6 +2,10 @@ package Client;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Set;
 
 public class ViewGuiClient {
@@ -13,7 +17,7 @@ public class ViewGuiClient {
     private JTextField textField = new JTextField(40);
     private JButton buttonDisable = new JButton("Отключиться");
     private JButton buttonConnect = new JButton("Подключиться");
-    private JLabel loggedInUserLabel = new JLabel();
+    private JLabel labelUsername = new JLabel();
 
     public ViewGuiClient(Client client) {
         this.client = client;
@@ -21,7 +25,7 @@ public class ViewGuiClient {
 
     // Метод, инициализирующий графический интерфейс клиентского приложения
     protected void initFrameClient() {
-        // Настройка компонентов GUI
+        // Настройка компонентов окна
         messages.setEditable(false);
         users.setEditable(false);
         frame.add(new JScrollPane(messages), BorderLayout.CENTER);
@@ -29,21 +33,62 @@ public class ViewGuiClient {
         panel.add(textField);
         panel.add(buttonConnect);
         panel.add(buttonDisable);
-        panel.add(loggedInUserLabel);
-        loggedInUserLabel.setText("Пользователь: ");
+        panel.add(labelUsername);
         frame.add(panel, BorderLayout.SOUTH);
         frame.pack();
-        frame.setLocationRelativeTo(null); // Отображение окна по центру экрана
+        frame.setLocationRelativeTo(null); // При запуске отображает окно по центру экрана
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
+        // Обработчик события при закрытии окна приложения
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (client.isConnect()) {
+                    client.disableClient();
+                }
+                System.exit(0);
+            }
+        });
+
+        // Добавление действий к кнопкам и полю ввода текста
+        frame.setVisible(true);
+        buttonDisable.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                client.disableClient();
+            }
+        });
+        buttonConnect.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                client.connectToServer();
+            }
+        });
+        textField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                client.sendMessageOnServer(textField.getText());
+                textField.setText("");
+            }
+        });
+
+        // Добавление стилей для дизайна кнопок и окна
+        panel.setBackground(Color.lightGray);
+        buttonConnect.setBackground(Color.darkGray);
+        buttonConnect.setForeground(Color.white);
+        buttonDisable.setBackground(Color.darkGray);
+        buttonDisable.setForeground(Color.white);
+
+        // Отображение никнейма под кнопками
+        panel.add(labelUsername);
     }
 
-    // Метод для добавления сообщения в текстовую область
+    // Метод для добавления сообщения в окно переписки
     protected void addMessage(String text) {
         messages.append(text);
     }
 
-    // Метод обновляет список имен подключившихся пользователей
+    // Метод для обновления списка подключенных пользователей
     protected void refreshListUsers(Set<String> listUsers) {
         users.setText("");
         if (client.isConnect()) {
@@ -55,45 +100,56 @@ public class ViewGuiClient {
         }
     }
 
-
-    // Отображает окно для ввода всех необходимых данных: адреса сервера, порта и имени пользователя
-    protected void showInputDialog() {
-        // Запрос адреса сервера
-        String serverAddress = JOptionPane.showInputDialog(frame, "Введите адрес сервера:", "Ввод данных", JOptionPane.QUESTION_MESSAGE);
-        if (serverAddress == null) {
-            // Окно было закрыто или отменено
-            return;
+    // Метод вызывает окно для ввода адреса сервера
+    protected String getServerAddressFromOptionPane() {
+        while (true) {
+            String addressServer = JOptionPane.showInputDialog(
+                    frame, "Введите адрес сервера:",
+                    "Ввод адреса сервера",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+            return addressServer.trim();
         }
-
-        // Запрос порта сервера
-        int port = -1;
-        boolean validPort = false;
-        while (!validPort) {
-            String portString = JOptionPane.showInputDialog(frame, "Введите порт сервера:", "Ввод данных", JOptionPane.QUESTION_MESSAGE);
-            if (portString == null) {
-                // Окно было закрыто или отменено
-                return;
-            }
-            try {
-                port = Integer.parseInt(portString.trim());
-                validPort = true;
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(frame, "Введен некорректный порт сервера. Попробуйте еще раз.", "Ошибка ввода порта сервера", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-
-        // Запрос имени пользователя
-        String username = JOptionPane.showInputDialog(frame, "Введите имя пользователя:", "Ввод данных", JOptionPane.QUESTION_MESSAGE);
-        if (username == null) {
-            // Окно было закрыто или отменено
-            return;
-        }
-
-
     }
 
-    // Отображает окно ошибки с заданным текстом
-    protected void showErrorDialog(String text) {
-        JOptionPane.showMessageDialog(frame, text, "Ошибка", JOptionPane.ERROR_MESSAGE);
+    // Метод вызывает окно для ввода порта сервера
+    protected int getPortServerFromOptionPane() {
+        while (true) {
+            String port = JOptionPane.showInputDialog(
+                    frame, "Введите порт сервера:",
+                    "Ввод порта сервера",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+            try {
+                return Integer.parseInt(port.trim());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(
+                        frame, "Введен некорректный порт сервера. Попробуйте еще раз.",
+                        "Ошибка ввода порта сервера", JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
+
+    // Метод вызывает окно для ввода имени пользователя
+    protected String getNameUser() {
+        return JOptionPane.showInputDialog(
+                frame, "Введите имя пользователя:",
+                "Ввод имени пользователя",
+                JOptionPane.QUESTION_MESSAGE
+        );
+    }
+
+    // Метод вызывает окно ошибки с заданным текстом
+    protected void errorDialogWindow(String text) {
+        JOptionPane.showMessageDialog(
+                frame, text,
+                "Ошибка", JOptionPane.ERROR_MESSAGE
+        );
+    }
+
+    // Метод для отображения никнейма под которым заходил пользователь
+    protected void setUsername(String username) {
+        labelUsername.setText("Вы вошли как: " + username);
     }
 }
